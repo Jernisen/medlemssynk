@@ -1,0 +1,26 @@
+# Kopiera till config.local.toml (ignoreras av git) och fyll i.
+
+[files]
+wondr_export = "data/wondr.csv"
+idrottonline_export = "data/idrottonline.xlsx"
+out_dir = "out"
+
+[wondr]
+# Regel för "aktiv medlem". Minst ett abonnemang måste uppfylla villkoret.
+# Alternativ: "debited_until"  -> Debited until >= idag
+#             "end_date"       -> End tom eller >= idag
+active_rule = "debited_until"
+
+# Abonnemangsnamn (Product / Subscription) som INTE ska räknas som medlemskap,
+# t.ex. engångspass eller personalkonton. Exakt matchning.
+ignore_subscriptions = [
+    "Drop-in",
+]
+
+[idrottonline]
+# Roller som aldrig ska föreslås för avslut, även om personen saknas i Wondr.
+protected_roles = [
+    "Ordförande",
+    "Kassör",
+    "Huvudadministratör",
+]

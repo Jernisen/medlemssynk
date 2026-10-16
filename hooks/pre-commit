@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Stoppar commits som innehåller något som ser ut som ett svenskt personnummer
+# eller en datafil. Aktivera med:  git config core.hooksPath hooks
+set -euo pipefail
+
+# 1. Blockera datafiler oavsett .gitignore (skydd mot `git add -f`)
+if git diff --cached --name-only | grep -Ei '\.(csv|tsv|xlsx|xlsm|xls|ods)$'; then
+    echo "pre-commit: datafil i commit – avbryter." >&2
+    exit 1
+fi
+
+# 2. Blockera personnummer i tillagda rader.
+#    Matchar YYMMDD-XXXX, YYYYMMDD-XXXX, med eller utan bindestreck/plus.
+#    Tillåt uttryckligen markerade testrader med "# fake-pnr".
+if git diff --cached -U0 \
+    | grep -E '^\+' \
+    | grep -v '^+++' \
+    | grep -v 'fake-pnr' \
+    | grep -E '\b(19|20)?[0-9]{2}(0[1-9]|1[0-2])([0-2][0-9]|3[01]|[6-9][0-9])[-+]?[0-9]{4}\b'; then
+    echo "pre-commit: möjligt personnummer i diff – avbryter." >&2
+    echo "Är det testdata? Märk raden med kommentaren 'fake-pnr'." >&2
+    exit 1
+fi
+
+exit 0
